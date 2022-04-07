@@ -1,17 +1,29 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import Login from "./admin-pages/Login";
+import NewProduct from "./admin-pages/NewProduct";
+import ProductList from "./components/ProductList";
+import { CookiesProvider } from "react-cookie";
+import { CategoryContextProvider } from "./store/CategoryContext";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <CookiesProvider>
+      <CategoryContextProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<App />}>
+              <Route path="/" element={<ProductList />} />
+            </Route>
+            <Route path="/admin/new-product" element={<NewProduct />} />
+            <Route path="/admin/sign-in" element={<Login />} />
+          </Routes>
+        </Router>
+      </CategoryContextProvider>
+    </CookiesProvider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
