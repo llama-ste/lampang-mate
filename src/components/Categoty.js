@@ -3,7 +3,13 @@ import CategoryContext from "../store/CategoryContext";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const Category = ({ category, editCategoryName, reload, cookies }) => {
+const Category = ({
+  category,
+  editCategoryName,
+  reload,
+  cookies,
+  editCategoryOrder,
+}) => {
   const categoryCtx = useContext(CategoryContext);
   const [categoryName, setCategoryName] = useState(category.name);
   const [editCategoryMode, setEditCategoryMode] = useState(false);
@@ -39,15 +45,15 @@ const Category = ({ category, editCategoryName, reload, cookies }) => {
 
   return (
     <div
-      key={category.id}
-      className="category"
+      className="btn-block paper-btn"
+      style={{ textAlign: "center" }}
       onClick={
-        editCategoryMode
+        editCategoryName || editCategoryOrder
           ? null
           : categoryCtx.selectCategory.bind(null, category.id)
       }
     >
-      <div key={category.id}>
+      <div>
         {editCategoryMode ? (
           <input
             value={categoryName}
@@ -59,17 +65,28 @@ const Category = ({ category, editCategoryName, reload, cookies }) => {
         )}
       </div>
       {editCategoryName && !editCategoryMode ? (
-        <div className="category-name-edit-wrapper">
-          <button onClick={editCategoryModeHandler}>✏️</button>
-          <button onClick={deleteCategoryHandler.bind(null, category.id)}>
+        <div>
+          <button className="btn-small" onClick={editCategoryModeHandler}>
+            ✏️
+          </button>
+          <button
+            className="btn-small border-danger"
+            style={{ marginLeft: "5px" }}
+            onClick={deleteCategoryHandler.bind(null, category.id)}
+          >
             🗑
           </button>
         </div>
       ) : null}
       {editCategoryMode && (
-        <div className="category-name-edit-wrapper">
-          <button onClick={editCategoryModeHandler}>취소</button>
-          <button onClick={completeEditHandler.bind(null, category.id)}>
+        <div>
+          <button className="btn-small" onClick={editCategoryModeHandler}>
+            취소
+          </button>
+          <button
+            className="btn-small"
+            onClick={completeEditHandler.bind(null, category.id)}
+          >
             저장
           </button>
         </div>

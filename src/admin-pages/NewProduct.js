@@ -4,19 +4,14 @@ import { useState, useRef, useEffect } from "react";
 import { useCookies } from "react-cookie";
 
 const NewProductWrapper = styled.div`
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
   flex-direction: column;
 
   & .container {
     width: 50%;
-  }
-
-  & .product-box {
-    display: flex;
-    gap: 30px;
   }
 
   & .input-box {
@@ -26,35 +21,24 @@ const NewProductWrapper = styled.div`
     margin-bottom: 15px;
   }
 
-  & .input-box input {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid lightgray;
-  }
-
-  & .input-box img {
-    width: min-content;
-  }
-
   & .error {
     color: red;
   }
 
-  & button {
-    padding: 10px 30px;
-    margin-right: 10px;
-    border: 1px solid black;
-    background: none;
-    border-radius: 10px;
-  }
-
-  & button:hover {
-    cursor: pointer;
+  & textarea {
+    margin-top: 5px;
+    width: 100%;
   }
 
   & .btn-wrapper {
     margin-top: 30px;
     text-align: center;
+  }
+
+  & select {
+    width: 30%;
+    margin-top: 5px;
+    margin-bottom: 20px;
   }
 `;
 
@@ -124,12 +108,17 @@ const NewProduct = () => {
       {
         headers: {
           Authorization: `Bearer ${cookies.token}`,
-          "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );
 
+    console.log(response);
+
+    console.log(response.body);
+
     const data = await response.json();
+
+    console.log(data);
 
     if (!response.ok) {
       setError(data.message);
@@ -141,7 +130,7 @@ const NewProduct = () => {
 
   return (
     <NewProductWrapper>
-      <h1>제품 추가</h1>
+      <h3>제품 추가</h3>
       <div className="container">
         {!isComplete && (
           <div>
@@ -162,19 +151,19 @@ const NewProduct = () => {
         )}
         {isComplete && (
           <form onSubmit={addProductHandler}>
-            <div className="product-box">
-              <div>
-                <img src={loadedInfo.image_url} alt="loadeaImage" />
-              </div>
-              <div>
-                <h2>{loadedInfo.name}</h2>
-                <h4>{Number(loadedInfo.price).toLocaleString("ko-KR")}원</h4>
-              </div>
+            <div>
+              <img src={loadedInfo.image_url} alt="loadedImage" />
+              <h4>{loadedInfo.name}</h4>
+              <h4>{Number(loadedInfo.price).toLocaleString("ko-KR")}원</h4>
             </div>
             <div>
-              <select onChange={selectCategoryHandler}>{options}</select>
-              <label>리뷰</label>
+              <label htmlFor="option">카테고리</label>
+              <select id="option" onChange={selectCategoryHandler}>
+                {options}
+              </select>
+              <label htmlFor="description">리뷰</label>
               <textarea
+                id="description"
                 required
                 ref={descriptionRef}
                 maxLength="150"

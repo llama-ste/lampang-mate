@@ -35,9 +35,9 @@ const Layout = (props) => {
     <LayoutWrapper>
       <main>
         <div className="sidebar">
-          <Sidebar cookies={cookies} />
+          <Sidebar cookies={cookies} removeCookie={removeCookie} />
         </div>
-        <section>
+        <section className="paper border">
           <Header cookies={cookies} removeCookie={removeCookie} />
           {props.children}
         </section>

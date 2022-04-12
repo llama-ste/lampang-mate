@@ -11,19 +11,12 @@ const LoginWrapper = styled.div`
   align-items: center;
 
   & .login-box {
-    width: 350px;
-    border: 1px solid black;
     padding: 40px;
-    border-radius: 10px;
   }
 
   & header {
     text-align: center;
     margin-bottom: 25px;
-  }
-
-  & h2 {
-    margin: 0px;
   }
 
   & .input-box {
@@ -33,25 +26,8 @@ const LoginWrapper = styled.div`
     margin-bottom: 25px;
   }
 
-  & input {
-    border-radius: 10px;
-    border: 1px solid lightgray;
-    padding: 15px;
-  }
-
   & .btn-box {
     text-align: end;
-  }
-
-  & .btn-box button {
-    padding: 15px 25px;
-    background-color: white;
-    border: 1px solid black;
-    border-radius: 10px;
-  }
-
-  & .btn-box button:hover {
-    cursor: pointer;
   }
 `;
 
@@ -116,9 +92,9 @@ const Login = () => {
 
   return (
     <LoginWrapper>
-      <div className="login-box">
+      <div className="login-box border">
         <header>
-          <h2>Adminustrator Login</h2>
+          <h3>Adminustrator Login</h3>
         </header>
         <form onSubmit={loginHanlder}>
           <div className="input-box">
@@ -130,13 +106,18 @@ const Login = () => {
               ref={passwordRef}
             />
           </div>
-          <input
-            id="auto"
-            type="checkbox"
-            value={check}
-            onChange={() => setCheck((prev) => !prev)}
-          />
-          <label htmlFor="auto"> 자동 로그인 하기</label>
+          <div className="form-group">
+            <label htmlFor="paperChecks1" className="paper-check">
+              <input
+                id="paperChecks1"
+                name="paperChecks"
+                type="checkbox"
+                value={check}
+                onChange={() => setCheck((prev) => !prev)}
+              />
+              <span>자동 로그인 하기</span>
+            </label>
+          </div>
           <div className="btn-box">
             <button>
               <b>Sign In</b>

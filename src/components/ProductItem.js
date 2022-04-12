@@ -1,40 +1,43 @@
 import { useState, useRef } from "react";
 import { useCookies } from "react-cookie";
 import styled from "styled-components";
-import Card from "./layout/Card";
 
 const ProductItemWrapper = styled.div`
   word-break: break-all;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 1rem;
+  &:hover {
+    cursor: pointer;
+  }
+
+  & .user-description p {
+    margin: 0px;
+  }
+
+  & .product-name {
+    font-size: 22px;
+  }
 
   & img {
     width: 100%;
   }
 
-  & a {
-    text-decoration: none;
-    color: black;
-  }
-
-  & p,
-  & h3 {
-    margin: 5px 0px 0px 0px;
-  }
-
-  & br {
-    border: 1px solid black;
-  }
-
-  & .price {
-    text-align: end;
-  }
-
+  & .price,
   & .btn-wrapper {
     text-align: end;
+    justify-self: flex-end;
   }
 
   & .btn-wrapper button {
-    padding: 5px 10px;
     margin-left: 5px;
+  }
+
+  & .textarea {
+    width: 100%;
+    margin-bottom: 10px;
   }
 `;
 
@@ -46,6 +49,13 @@ const ProductItem = (props) => {
   const updateText = useRef();
 
   const editHandler = () => setEditMode((prev) => !prev);
+
+  const coupangHandler = () => {
+    if (editMode) {
+      return;
+    }
+    window.location.href = props.affiliate_url;
+  };
 
   const updateProductHandler = async (id) => {
     const currText = updateText.current.value;
@@ -81,44 +91,60 @@ const ProductItem = (props) => {
   };
 
   return (
-    <Card>
-      <ProductItemWrapper>
-        <a href={editMode ? "#" : props.affiliate_url} id={props.id}>
+    <ProductItemWrapper className="border">
+      <div onClick={coupangHandler} id={props.id}>
+        <div>
           <img alt="product-img" src={props.image_url} />
-          <div className="name">
-            <p>{props.name}</p>
-          </div>
+          <p>
+            <b className="product-name">{props.name}</b>
+          </p>
           <div className="price">
-            <span>{Number(props.price).toLocaleString("ko-KR")}원</span>
+            <p>{Number(props.price).toLocaleString("ko-KR")}원</p>
           </div>
-          <hr />
-          <b>{props.username}</b>
-          {editMode ? (
-            <textarea defaultValue={props.description} ref={updateText} />
-          ) : (
-            <div className="review">
-              <p>{props.description}</p>
-            </div>
-          )}
-        </a>
-
-        {editMode ? (
-          <div className="btn-wrapper">
-            <button onClick={editHandler}>취소</button>
-            <button onClick={updateProductHandler.bind(null, props.id)}>
-              저장
-            </button>
+          <div className="user-description">
+            <p>
+              <b>{props.username}</b>
+            </p>
+            {editMode ? (
+              <textarea
+                className="card-text textarea"
+                defaultValue={props.description}
+                ref={updateText}
+              />
+            ) : (
+              <div className="review">
+                <p className="card-text">{props.description}</p>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="btn-wrapper">
-            <button onClick={editHandler}>수정</button>
-            <button onClick={deleteProductHandler.bind(null, props.id)}>
-              삭제
-            </button>
-          </div>
-        )}
-      </ProductItemWrapper>
-    </Card>
+        </div>
+      </div>
+      {editMode && cookies.token ? (
+        <div className="btn-wrapper">
+          <button className="btn-small" onClick={editHandler}>
+            취소
+          </button>
+          <button
+            className="btn-small"
+            onClick={updateProductHandler.bind(null, props.id)}
+          >
+            저장
+          </button>
+        </div>
+      ) : cookies.token ? (
+        <div className="btn-wrapper">
+          <button className="btn-small" onClick={editHandler}>
+            수정
+          </button>
+          <button
+            className="btn-small btn-danger-outline"
+            onClick={deleteProductHandler.bind(null, props.id)}
+          >
+            삭제
+          </button>
+        </div>
+      ) : null}
+    </ProductItemWrapper>
   );
 };
 

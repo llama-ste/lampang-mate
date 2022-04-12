@@ -5,22 +5,6 @@ import CategoryContext from "../store/CategoryContext";
 // import Loader from "../UI/Loader";
 
 const ProductListWrapper = styled.div`
-  & .sort {
-    text-align: end;
-    margin-bottom: 25px;
-  }
-
-  & select {
-    padding: 10px;
-    border: none;
-    background-color: #f1f2f4;
-    border-radius: 5px;
-  }
-
-  & select:hover {
-    cursor: pointer;
-  }
-
   & .item-wrapper {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -57,7 +41,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [isEmpty, setIsEmpty] = useState(true);
-  const [isLoaded, setIdLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [sort, setSort] = useState("latest");
   const [prevSort, setPrevSort] = useState(sort);
   const { category, prevCategory, completeChange } =
@@ -92,21 +76,26 @@ const ProductList = () => {
 
     if (category === prevCategory && sort === prevSort) {
       const fetchProducts = async () => {
-        setIdLoaded(true);
+        setIsLoaded(true);
         const response = await (await fetch(url)).json();
         if (response.pagination.is_last_page) {
           endRef.current = true;
         }
+        console.log(response);
+        if (page === 1) {
+          setProducts([...response.products]);
+        } else {
+          setProducts((prev) => [...prev, ...response.products]);
+        }
 
-        setProducts((prev) => [...prev, ...response.products]);
-        setIdLoaded(false);
+        setIsLoaded(false);
         setIsEmpty(false);
         preventRef.current = true;
       };
 
       fetchProducts();
     }
-  }, [category, page, completeChange, prevSort, sort, prevCategory]);
+  }, [category, page, sort, completeChange, prevCategory, prevSort]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(obsHandler, { threshold: 1 });
@@ -173,8 +162,13 @@ const ProductList = () => {
 
   return (
     <ProductListWrapper>
-      <div className="sort">
-        <select onChange={sortHandler} value={sort}>
+      <div className="form-group">
+        <select
+          id="paperSelects1"
+          className="border border-primary"
+          onChange={sortHandler}
+          value={sort}
+        >
           <option value="latest">최신 등록순</option>
           <option value="highest_price">가격 높은순</option>
           <option value="lowest_price">가격 낮은순</option>

@@ -1,31 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { ReactSortable } from "react-sortablejs";
+
 import Category from "../Categoty";
+import CategoryContext from "../../store/CategoryContext";
 
 const SidebarWrapper = styled.div`
   margin-top: 15vh;
   width: 250px;
   margin-right: 50px;
 
-  &:hover {
-    cursor: pointer;
-  }
-
   & .categories {
-    margin: 20px 0px;
-  }
-
-  & .category {
-    border: 1px solid black;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 0px;
-    margin: 10px 0px;
-    position: relative;
+    gap: 10px;
+    margin: 20px 0px;
   }
 
   & .category-form {
@@ -33,47 +23,30 @@ const SidebarWrapper = styled.div`
   }
 
   & .category-form p {
-    margin: 0px 0px 5px 0px;
+    margin: 30px 0px 0px 0px;
   }
 
-  & .category-form input {
-    margin-right: 5px;
-  }
-
-  & .category-name-edit-wrapper {
-    position: absolute;
-    bottom: 0;
-    right: 0;
+  & input {
+    width: 100%;
+    margin: 10px 0px;
   }
 
   & .btn-wrapper {
     text-align: center;
-    margin-bottom: 20px;
-  }
-
-  & .btn-wrapper a,
-  & .btn-wrapper button {
-    text-decoration: none;
-    color: black;
-    border: 1px solid black;
-    padding: 10px 20px;
-    border-radius: 5px;
-    background-color: white;
-  }
-
-  & button:hover {
-    cursor: pointer;
+    margin-bottom: 10px;
   }
 `;
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const Sidebar = ({ cookies }) => {
+const Sidebar = ({ cookies, removeCookie }) => {
   const [categories, setCategories] = useState([]);
   const [editCategoryOrder, setEditCategoryOrder] = useState(false);
   const [editCategoryName, setEditCategoryName] = useState(false);
   const [reloadCategory, setReloadCategory] = useState(false);
   const [categoryName, setCategoryName] = useState("");
+
+  const { selectCategory } = useContext(CategoryContext);
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -112,7 +85,7 @@ const Sidebar = ({ cookies }) => {
     setEditCategoryName((prev) => !prev);
   };
 
-  const editCategoryHandler = () => {
+  const editCategoryOrderHandler = () => {
     setEditCategoryOrder(true);
   };
 
@@ -141,6 +114,24 @@ const Sidebar = ({ cookies }) => {
     setEditCategoryOrder(false);
   };
 
+  const logoutHandler = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/auth/sign_out`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${cookies.token}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      removeCookie("token", { path: "/" });
+      removeCookie("refreshToken", { path: "/" });
+      removeCookie("username", { path: "/" });
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+
   return (
     <SidebarWrapper>
       {categories.length > 0 && (
@@ -152,6 +143,14 @@ const Sidebar = ({ cookies }) => {
           delayOnTouchOnly={true}
           disabled={editCategoryOrder ? false : true}
         >
+          <button
+            onClick={() => {
+              selectCategory("");
+            }}
+            className="btn-block"
+          >
+            <b>전체보기</b>
+          </button>
           {categories.map((category) => {
             return (
               <Category
@@ -160,6 +159,7 @@ const Sidebar = ({ cookies }) => {
                 reload={reloadHandler}
                 category={category}
                 editCategoryName={editCategoryName}
+                editCategoryOrder={editCategoryOrder}
               />
             );
           })}
@@ -175,7 +175,9 @@ const Sidebar = ({ cookies }) => {
                 onChange={(e) => setCategoryName(e.target.value)}
                 placeholder="Category Name"
               />
-              <button>추가</button>
+              <div className="btn-wrapper">
+                <button className="btn-small">추가</button>
+              </div>
             </form>
           </div>
           <div className="btn-wrapper">
@@ -183,7 +185,7 @@ const Sidebar = ({ cookies }) => {
           </div>
         </div>
       )}
-      {!editCategoryName && !editCategoryOrder && (
+      {!editCategoryName && !editCategoryOrder && cookies.token && (
         <div className="btn-wrapper">
           <button onClick={editCategoryNameHandler}>카테고리 관리</button>
         </div>
@@ -194,9 +196,10 @@ const Sidebar = ({ cookies }) => {
           <button onClick={sortedCategoryHandler}>수정</button>
         </div>
       ) : (
-        !editCategoryName && (
+        !editCategoryName &&
+        cookies.token && (
           <div className="btn-wrapper">
-            <button onClick={editCategoryHandler}>
+            <button onClick={editCategoryOrderHandler}>
               카테고리 순서 변경하기
             </button>
           </div>
@@ -204,8 +207,13 @@ const Sidebar = ({ cookies }) => {
       )}
       <div className="btn-wrapper">
         {cookies.token && !editCategoryOrder && !editCategoryName && (
-          <Link to="/admin/new-product">새 제품 추가</Link>
+          <Link className="" to="/admin/new-product">
+            <button>새 제품 추가</button>
+          </Link>
         )}
+      </div>
+      <div className="btn-wrapper">
+        {cookies.token && <button onClick={logoutHandler}>로그아웃</button>}
       </div>
     </SidebarWrapper>
   );

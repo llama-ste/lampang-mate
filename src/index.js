@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import Login from "./admin-pages/Login";
@@ -9,7 +9,9 @@ import ProductList from "./components/ProductList";
 import { CookiesProvider } from "react-cookie";
 import { CategoryContextProvider } from "./store/CategoryContext";
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
+root.render(
   <React.StrictMode>
     <CookiesProvider>
       <CategoryContextProvider>
@@ -24,6 +26,5 @@ ReactDOM.render(
         </Router>
       </CategoryContextProvider>
     </CookiesProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
